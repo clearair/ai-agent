@@ -1,14 +1,16 @@
 use anyhow::Ok;
 use async_openai::types::chat::{
     ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs,
-    CreateChatCompletionRequestArgs,
+    CreateChatCompletionRequestArgs, ResponseFormat, ResponseFormatJsonSchema,
 };
 
-pub async fn chat_complete(
+use crate::models::action_plan::ActionPlan;
+
+pub async fn chat_complete_structured(
     model: &str,
     system: Option<&str>,
     prompt: &str,
-) -> anyhow::Result<String> {
+) -> anyhow::Result<ActionPlan> {
     let client = async_openai::Client::new();
     let mut messages = vec![];
 
@@ -28,9 +30,22 @@ pub async fn chat_complete(
             .into(),
     );
 
+    let schema = schemars::schema_for!(ActionPlan);
+    let schema_json = schema.as_value().clone();
+    let format_setting = ResponseFormat::JsonSchema {
+        json_schema: ResponseFormatJsonSchema {
+            description: Some(
+                "A step-by-step agent action plan with difficulty and time estimate".into(),
+            ),
+            name: "action_plan".to_string(),
+            schema: schema_json,
+            strict: Some(true),
+        },
+    };
     let request = CreateChatCompletionRequestArgs::default()
         .model(model)
         .messages(messages)
+        .response_format(format_setting)
         .max_tokens(2048u32)
         .build()?;
     //  tracing::info!("requesting");
@@ -38,12 +53,13 @@ pub async fn chat_complete(
 
     tracing::info!("Response {:#?}", response);
 
-    let content = response
+    let plan: ActionPlan = response
         .choices
         .into_iter()
         .next()
         .and_then(|c| c.message.content)
-        .ok_or_else(|| anyhow::anyhow!("No content in response"))?;
+        .ok_or_else(|| anyhow::anyhow!("No content in response"))
+        .and_then(|s| serde_json::from_str(&s).map_err(Into::into))?;
 
-    Ok(content)
+    Ok(plan)
 }
