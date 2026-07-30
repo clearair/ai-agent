@@ -14,6 +14,7 @@ async-stream = "0.3.6"
 backon = "1.6.0"
 dotenv = "0.15.0"
 futures = "0.3.33"
+reqwest = { version = "0.13.4", features = ["json"] }
 schemars = "1.2.2"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_json = "1.0.151"
