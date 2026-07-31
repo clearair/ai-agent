@@ -1,4 +1,8 @@
-use async_openai::types::chat::{ChatCompletionFunctionsArgs, ChatCompletionRequestSystemMessageArgs, ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequestArgs, FinishReason, ResponseFormat, ResponseFormatJsonSchema};
+use async_openai::types::chat::{
+    ChatCompletionFunctionsArgs, ChatCompletionRequestSystemMessageArgs,
+    ChatCompletionRequestUserMessageArgs, CreateChatCompletionRequestArgs, FinishReason,
+    ResponseFormat, ResponseFormatJsonSchema,
+};
 use backon::{ExponentialBuilder, Retryable};
 
 use crate::gaia::models::GaiaOutput;
@@ -13,8 +17,12 @@ If you are asked for a string, don't use articles, neither abbreviations (e.g., 
 If you are asked for a comma-separated list, apply the above rules depending on whether the element is a number or a string.
 "#;
 
-pub async fn solove_problem_with_retry(model: &str, system: &str, prompt: &str) -> anyhow::Result<GaiaOutput> {
-    let op = || async {solve_problem(model, system, prompt).await};
+pub async fn solove_problem_with_retry(
+    model: &str,
+    system: &str,
+    prompt: &str,
+) -> anyhow::Result<GaiaOutput> {
+    let op = || async { solve_problem(model, system, prompt).await };
     op.retry(ExponentialBuilder::default().with_max_times(3))
         .await
 }
@@ -23,7 +31,12 @@ async fn solve_problem(model: &str, system: &str, prompt: &str) -> anyhow::Resul
     let schema = schemars::schema_for!(GaiaOutput);
     let serde_json = serde_json::to_value(&schema)?;
     let format_setting = ResponseFormat::JsonSchema {
-        json_schema: ResponseFormatJsonSchema { description: Some("GAIA problem solving output".into()), name: "gaia_output".into(), schema: serde_json, strict: Some(true) }
+        json_schema: ResponseFormatJsonSchema {
+            description: Some("GAIA problem solving output".into()),
+            name: "gaia_output".into(),
+            schema: serde_json,
+            strict: Some(true),
+        },
     };
 
     let client = async_openai::Client::new();
@@ -59,7 +72,9 @@ async fn solve_problem(model: &str, system: &str, prompt: &str) -> anyhow::Resul
     }
 
     let conent = choice
-        .message.content.ok_or_else(|| anyhow::anyhow!("No content in response"))?;
+        .message
+        .content
+        .ok_or_else(|| anyhow::anyhow!("No content in response"))?;
 
     let output: GaiaOutput = serde_json::from_str(&conent)?;
 

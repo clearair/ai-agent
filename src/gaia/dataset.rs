@@ -6,7 +6,8 @@ pub async fn load_gaia_level1() -> anyhow::Result<Vec<GaiaRow>> {
     let token = std::env::var("HF_TOKEN")?;
 
     let client = reqwest::Client::new();
-    let response = client.get("https://datasets-server.huggingface.co/rows")
+    let response = client
+        .get("https://datasets-server.huggingface.co/rows")
         .query(&[
             ("dataset", "gaia-benchmark/GAIA"),
             ("config", "2023_level1"),
@@ -15,10 +16,10 @@ pub async fn load_gaia_level1() -> anyhow::Result<Vec<GaiaRow>> {
             ("length", "10"),
         ])
         .bearer_auth(token)
-        .send().await?;
+        .send()
+        .await?;
 
     let status = response.status();
-
 
     if !status.is_success() {
         let body = response.text().await?;

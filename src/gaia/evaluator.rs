@@ -1,5 +1,7 @@
-
-use crate::gaia::{models::{GaiaEvalResult, GaiaRow}, solver::{GAIA_PROMPT, solove_problem_with_retry}};
+use crate::gaia::{
+    models::{GaiaEvalResult, GaiaRow},
+    solver::{GAIA_PROMPT, solove_problem_with_retry},
+};
 
 fn is_correct(prediction: &str, answer: &str) -> bool {
     if prediction.is_empty() {
@@ -32,6 +34,6 @@ pub async fn evaluate_gaia_single(problem: GaiaRow, model: &str) -> GaiaEvalResu
             answer: problem.final_answer,
             unsolvable_reason: None,
             error: Some(err.to_string()),
-        }
+        },
     }
 }

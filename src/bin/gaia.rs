@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use ai_agent::{gaia::{dataset::load_gaia_level1, evaluator::evaluate_gaia_single, models::GaiaEvalResult}, llm::semaphore::get_semaphore};
+use ai_agent::{
+    gaia::{dataset::load_gaia_level1, evaluator::evaluate_gaia_single, models::GaiaEvalResult},
+    llm::semaphore::get_semaphore,
+};
 use tokio::task::JoinSet;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
@@ -17,9 +20,7 @@ async fn main() -> anyhow::Result<()> {
     gaia_level1_experiment().await
 }
 
-const MODELS: &[&str] = &[
-    "grok-3",
-];
+const MODELS: &[&str] = &["grok-3"];
 
 pub async fn gaia_level1_experiment() -> anyhow::Result<()> {
     let problems = load_gaia_level1().await?;
@@ -48,7 +49,7 @@ pub async fn gaia_level1_experiment() -> anyhow::Result<()> {
             Err(err) => tracing::error!("task panicked: {err}"),
         }
     }
-    
+
     for (model, evals) in &results {
         let correct = evals.iter().filter(|e| e.correct).count();
 

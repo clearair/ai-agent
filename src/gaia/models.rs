@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug)]
 pub struct HfResponse {
-    pub rows: Vec<HfRow>
+    pub rows: Vec<HfRow>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -15,7 +15,7 @@ pub struct HfRow {
 pub struct GaiaRow {
     pub task_id: String,
 
-    #[serde(rename="Question")]
+    #[serde(rename = "Question")]
     pub question: String,
 
     #[serde(rename = "Level")]
