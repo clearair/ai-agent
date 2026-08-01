@@ -11,10 +11,16 @@ edition = "2024"
 name = "tool_call_complete"
 path = "examples/tool_call_complete.rs"
 
+[[example]]
+name = "simple_agent_loop"
+path = "examples/simple_agent_loop.rs"
+
+
 [dependencies]
 anyhow = "1.0.104"
 async-openai = { version = "0.41.1", features = ["chat-completion"]}
 async-stream = "0.3.6"
+async-trait = "0.1.91"
 backon = "1.6.0"
 dotenv = "0.15.0"
 futures = "0.3.33"
