@@ -5,7 +5,7 @@ use async_openai::types::chat::{
     ChatCompletionRequestUserMessageArgs, ChatCompletionTools, CreateChatCompletionRequestArgs,
 };
 
-use crate::tools::calculator::execute::{CalculatorArgs, calculation};
+use crate::tools::{calculator::execute::{CalculatorArgs, calculation}, web_search::execute::{WebSearchArgs, search_web}};
 
 pub async fn chat_complete(
     model: &str,
@@ -50,6 +50,8 @@ pub async fn chat_complete(
         .next()
         .ok_or_else(|| anyhow::anyhow!("No choices in response"))?
         .message;
+    
+    tracing::info!("message: {}", serde_json::to_string(&message)?);
 
     if let Some(tool_calls) = message.tool_calls {
         messages.push(
@@ -79,6 +81,24 @@ pub async fn chat_complete(
                         };
 
                         tracing::info!("Calculator result: {tool_result}");
+
+                        messages.push(
+                            ChatCompletionRequestToolMessageArgs::default()
+                                .tool_call_id(function_call.id.clone())
+                                .content(tool_result)
+                                .build()?
+                                .into(),
+                        );
+                    } else if function_name == "web_search" {
+                        let args: WebSearchArgs = serde_json::from_str(&arguments)?;
+                        let result = search_web(args).await;
+
+                        let tool_result = match result {
+                            Ok(results) => serde_json::to_string(&results)?,
+                            Err(error) => error.to_string(),
+                        };
+
+                        // tracing::info!("Web search result: {tool_result}");
 
                         messages.push(
                             ChatCompletionRequestToolMessageArgs::default()
