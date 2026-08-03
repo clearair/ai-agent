@@ -1,0 +1,25 @@
+{
+  "servers": [
+    {
+      "title": "Expense",
+      "type": "stdio",
+      "command": "cargo",
+      "args": [
+        "run",
+        "--quiet",
+        "--bin",
+        "expense_mcp_server"
+      ],
+      "envs": {
+        "EXPENSE_API_URL": "http://127.0.0.1:3000",
+        "EXPENSE_API_KEY": "dev-secret-key"
+      }
+    },
+    {
+        "title": "HTTP Demo",
+        "type": "http",
+        "url": "https://127.0.0.1:3001/mcp",
+        "headers": {}
+    }
+  ]
+}

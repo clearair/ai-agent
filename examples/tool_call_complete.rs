@@ -10,7 +10,7 @@ async fn main() -> anyhow::Result<()> {
         .with_max_level(Level::INFO)
         .finish();
 
-    let tools = build_toolbox();
+    let tools = build_toolbox().await?;
 
     tracing::subscriber::set_global_default(subscriber)?;
 

@@ -1,6 +1,4 @@
-use async_openai::types::chat::{
-    ChatCompletionTool, ChatCompletionTools, FunctionObject, FunctionObjectArgs,
-};
+use async_openai::types::chat::{ChatCompletionTool, ChatCompletionTools, FunctionObjectArgs};
 use serde_json::Value;
 
 #[async_trait::async_trait]
